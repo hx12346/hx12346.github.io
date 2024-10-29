@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Weblogic 弱口令、任意文件读取漏洞（靶场来自vulhub/weblogic/weak_password） | 欢迎来到 &lt;菜鸟小雨&gt; 的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="Weblogic 弱口令、任意文件读取漏洞（靶场来自vulhub&#x2F;weblogic&#x2F;weak_password）">
+<meta property="og:url" content="http://example.com/2024/10/29/weblogic/index.html">
+<meta property="og:site_name" content="欢迎来到 &lt;菜鸟小雨&gt; 的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/1.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/2.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/3.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/4.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/5.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/6.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/7.jpg">
+<meta property="og:image" content="http://example.com/2024/10/29/weblogic/8.jpg">
+<meta property="article:published_time" content="2024-10-29T06:49:48.787Z">
+<meta property="article:modified_time" content="2024-10-29T07:15:15.974Z">
+<meta property="article:author" content="菜鸟小雨">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/10/29/weblogic/1.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="欢迎来到 <菜鸟小雨> 的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">欢迎来到 &lt;菜鸟小雨&gt; 的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">不断探索，不断成长</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-weblogic" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/10/29/weblogic/" class="article-date">
+  <time class="dt-published" datetime="2024-10-29T06:49:48.787Z" itemprop="datePublished">2024-10-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Weblogic 弱口令、任意文件读取漏洞（靶场来自vulhub/weblogic/weak_password）
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <html><head></head><body><p>WebLogic Server是Oracle公司推出的一款基于Java的应用服务器，它提供了一个稳定可靠的平台，用于开发、部署和管理企业级Java应用程序。WebLogic Server是一种大规模、高可用性和高性能的应用服务器，广泛用于企业级应用的构建和部署。WebLogic Server作为一款广泛使用的应用服务器，存在各种类型的漏洞。</p>
+<p>访问界面：<br><br></p>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/1.jpg" style="zoom:100%;">
+</div>
+
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/2.jpg" style="zoom:100%;">
+</div>
+
+<p>（1）弱口令漏洞复现：<br>常用弱口令：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">system:password </span><br><span class="line">weblogic:weblogic </span><br><span class="line">admin:secruity</span><br><span class="line">joe:password </span><br><span class="line">mary:password</span><br><span class="line"> system:sercurity</span><br><span class="line">wlcsystem: wlcsystem</span><br><span class="line"> weblogic:Oracle@123</span><br></pre></td></tr></tbody></table></figure>
+<p>可以自行在收集weblogic的弱口令进行爆破尝试<br>bp出来账号密码： weblogic:Oracle@123</p>
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/3.jpg" style="zoom:100%;">
+</div>
+
+<p>（2）假设不存在弱口令，如何对weblogic进行渗透？<br>本环境前台模拟了一个任意文件下载漏洞，访问<a target="_blank" rel="noopener" href="http://your-ip:7001/hello/file.jsp?path=/etc/passwd%E5%8F%AF%E8%A7%81%E6%88%90%E5%8A%9F%E8%AF%BB%E5%8F%96passwd%E6%96%87%E4%BB%B6%E3%80%82">http://your-ip:7001/hello/file.jsp?path=/etc/passwd可见成功读取passwd文件。</a></p>
+<p>1.weblogic密码使用AES（老版本3DES）加密，对称加密可解密，只需要找到用户的密文与加密时的密钥即可。这两个文件均位于base_domain下，名为SerializedSystemIni.dat和config.xml，在本环境中为./security/SerializedSystemIni.dat和./config/config.xml（基于当前目录/root/Oracle/Middleware/user_projects/domains/base_domain）。</p>
+<p>2 ./security/SerializedSystemIni.dat是一个二进制文件，所以一定要用burpsuite来读取，用浏览器直接下载可能引入一些干扰字符。在burp里选中读取到的那一串乱码，右键copy to file就可以保存成一个文件：</p>
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/4.jpg" style="zoom:100%;">
+</div>
+
+<ol start="3">
+<li>./config/config.xml的文件</li>
+</ol>
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/5.jpg" style="zoom:100%;">
+</div>
+
+<p>4.找到特定标签，‘manager-password’，上述即为加密后的管理员密码<br>解密密文：然后使用本环境的decrypt目录下的weblogic_decrypt.jar，解密密文</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar weblogic_decrypt.jar </span><br></pre></td></tr></tbody></table></figure>
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/6.jpg" style="zoom:100%;">
+</div>
+
+<p>（3）后台上传webshell<br>获取到管理员密码后，登录后台。点击左侧的部署，可见一个应用列表：<br>因为只允许war文件，所以上传2.war，如何生成？先创建1.jsp，写入jsp的一句话木马，在解压为zip，在更名为2.war即可，一句话木马如下，密码为passwd</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy/b 1.jpg +1.php  2.jpg</span><br></pre></td></tr></tbody></table></figure>
+<br>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/7.jpg" style="zoom:100%;">
+</div>
+
+<p>上传成功<br><br></p>
+<div style="text-align: left; display: flex; align-items: center;">
+<img src="/2024/10/29/weblogic/8.jpg" style="zoom:100%;">
+</div>
+
+<p>我处没有连接成功：（看vulhub的解释说明，我处就不演示）<br>上传war包。值得注意的是，我们平时tomcat用的war包不一定能够成功，你可以将你的webshell放到本项目的web/hello.war这个压缩包中，再上传。上传成功后点下一步。</p>
+</body></html>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2024/10/29/weblogic/" data-id="cm2u45ms70001xgag5mle4mr6" data-title="Weblogic 弱口令、任意文件读取漏洞（靶场来自vulhub/weblogic/weak_password）" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2024/10/28/fastjosn/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Fastjson 1.2.24 反序列化导致任意命令执行漏洞</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">十月 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/10/29/weblogic/">Weblogic 弱口令、任意文件读取漏洞（靶场来自vulhub/weblogic/weak_password）</a>
+          </li>
+        
+          <li>
+            <a href="/2024/10/28/fastjosn/">Fastjson 1.2.24 反序列化导致任意命令执行漏洞</a>
+          </li>
+        
+          <li>
+            <a href="/2024/10/28/%E2%80%9CHelloWorld%E2%80%9D/">“HelloWorld”</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 菜鸟小雨<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
